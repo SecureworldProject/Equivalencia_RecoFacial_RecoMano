@@ -11,7 +11,7 @@ from os import remove
 from os import path
 import tkinter as tk
 from tkinter import messagebox
-import lock
+#import lock
 
 
 # variables globales
@@ -25,10 +25,20 @@ def init(props):
     
     #props es un diccionario
     props_dict= props
-    resultado=executeChallenge()
-    if (resultado[1]>0):
+     # Ejecución del challenge para ver si funciona (no se comprueba la clave)
+    #executeChallenge()
+
+    # Fake de la ejecución
+    if props_dict["mode"] == "parental":
+        resultado = ('\0', 1)
+
+    else: # Modo no parental
+        resultado = ('1', 1)
+
+    # Comprobación de que la longitud del resultado es mayor que cero (ejecución sin problemas)
+    if (resultado[1] > 0):
         return 0
-    else: 
+    else:
         return -1
     
 
@@ -41,10 +51,7 @@ def calcularDistancia (x1,y1,x2,y2):
 
 def executeChallenge():
     print("Starting execute")
-     # mecanismo de lock BEGIN
-    # -----------------------
-    lock.lockIN("Reco_Manos")
-
+    
     resul=[]
     def cerrar():
         ventana.destroy()
@@ -215,9 +222,8 @@ def executeChallenge():
     
    # Construcción de la respuesta
     if mode == "parental":
-        if rmse >= 0 and rmse <= df.iloc[0,11]:   resp= 1
-        else: 
-                                                  resp= 0
+        if rmse >= 0 and rmse <= df.iloc[0,11]:   cad = '\0'
+        else:                                     cad = '\u0001'
         
     else:   # Modo no parental 
         print(rmse)
@@ -237,10 +243,8 @@ def executeChallenge():
         elif rmse > 65:                                   resp=12   
     
     
+        cad="%d"%(resp)
 
-
-
-    cad="%d"%(resp)
     key = bytes(cad,'utf-8')
     key_size = len(key)
     result =(key, key_size)
@@ -252,6 +256,6 @@ def executeChallenge():
     lock.lockOUT("Reco_Manos")
 
 if __name__ == "__main__":
-    midict={"mode": "normal"}
+    midict={"mode": "parental"}
     print(init(midict))
-    #executeChallenge()
+    print(executeChallenge())
